@@ -1,0 +1,272 @@
+.angular-ui-tree-handle {
+    border: 1px solid #d2d2d2;
+    padding: 8px 16px;
+    margin-top: 2px;
+    height: 56px;
+    border-radius: 4px;
+}
+
+.angular-ui-tree-handle .text-muted {
+    color: #888;
+    font-weight: 400;
+}
+
+.angular-ui-tree-handle.selected {
+    background-color: #d7f4ff
+}
+
+.angular-ui-tree-handle .btn {
+    width: 45px;
+}
+
+.chart-container {
+    font-size: 12px;
+    position: relative;
+}
+
+.chart-container .chart-title {
+    position: absolute;
+    top: 10px;
+    background-color: rgba(0, 0, 0, 0.75);
+    padding: 3px 6px;
+    border-radius: 2px;
+}
+
+.absright {
+    right: 10px;
+}
+
+.absleft {
+    left: 10px;
+}
+
+.chart-container button.reload-btn {
+    width: 32px;
+    padding: 3px 6px;
+    display: none;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.75);
+    position: absolute;
+    top: 40px;
+    font-size: 10px;
+    height: 28px;
+    border-radius: 2px;
+}
+
+.chart-container:hover button.reload-btn {
+    display: inline;
+}
+
+.chart-container:hover button.reload-btn:hover i {
+    color: white;
+}
+
+.chart-container:hover button.reload-btn:active i {
+    color: white;
+}
+
+.chart-container:hover button.reload-btn:focus i {
+    color: white;
+}
+
+.color-scheme-result {
+    display: flex;
+    margin-top: 8px;
+}
+
+.color-scheme-result div {
+    flex-grow: 1
+}
+
+h3 small {
+    font-size: 0.6em;
+    font-style: italic;
+    margin-top: 6px;
+    display: inherit;
+    border-top: 1px solid #ccc;
+    padding-top: 6px;
+}
+
+.col-wrapper {
+    position: relative;
+}
+
+.col-wrapper .col-controls {
+    position: absolute;
+    z-index: 10;
+    top: 10px;
+    height: 24px;
+}
+
+.col-wrapper .col-controls .btn {
+    font-size: 10px;
+}
+
+.mock-grid {
+    background-color: rgb(248, 249, 250);
+    border: 1px solid #ccc;
+}
+
+.navbar .dropdown-toggle,
+.navbar .dropdown-menu a {
+    cursor: pointer;
+}
+
+.navbar .dropdown-item.active,
+.navbar .dropdown-item:active {
+    color: inherit;
+    text-decoration: none;
+    background-color: inherit;
+}
+
+.navbar .dropdown-item:focus,
+.navbar .dropdown-item:hover {
+    color: #16181b;
+    text-decoration: none;
+    background-color: #f8f9fa;
+}
+
+@media (min-width: 767px) {
+    .navbar .dropdown-toggle:not(.nav-link)::after {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: .5em;
+        vertical-align: 0;
+        border-bottom: .3em solid transparent;
+        border-top: .3em solid transparent;
+        border-left: .3em solid;
+    }
+}
+
+.dropdown-item {
+    padding: 4px 8px;
+    font-size: 1rem;
+}
+
+.no-data:after {
+    content: 'No Data Found';
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    text-align: center;
+    top: 100px;
+    color: #cecece;
+}
+
+#report-header {
+    margin-top: 10px;
+}
+
+@media (max-width: 575px) {
+    #filters {
+        padding-top: 0px !important;
+        margin-bottom: 3px;
+        width: 60%;
+        left: 10px;
+        position: absolute;
+        white-space: nowrap;
+        display: flex;
+        top: 12px;
+    }
+
+    #filters .btn {
+        flex-grow: 1;
+        border-radius: 0px;
+    }
+
+    #report-header {
+        margin-top: 0px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #report-header small {
+        display: none;
+    }
+
+    #report-header {
+        font-size: 1.4em;
+        margin-bottom: 0px !important;
+        text-align: center;
+        width: calc(100% + 30px);
+        padding: 20px;
+        margin-left: -15px;
+        margin-right: -15px;
+        background-color: #ffffffbd;
+    }
+
+    .table-wrapper {
+        height: 100% !important;
+        overflow: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .filter-wrapper {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 120px;
+        z-index: -1;
+    }
+
+    input[type="color"],
+    input[type="date"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="email"],
+    input[type="month"],
+    input[type="number"],
+    input[type="password"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="text"],
+    input[type="time"],
+    input[type="url"],
+    input[type="week"],
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
+    .filter-pane {
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .navbar {
+        margin-bottom: 0px !important;
+    }
+
+    ul.dropdown-menu {
+        background-color: #dedede;
+        border-radius: 0px;
+        margin-left: -17px;
+        margin-right: -17px;
+    }
+}
+
+.table-bordered td {
+    border: 1px solid #e0e0e0;
+}
+
+.table-bordered th {
+    border: 1px solid #30383e;
+}
+
+.table-bordered {
+    border: 1px solid #30383e;
+}
+
+.table thead th {
+    vertical-align: bottom;
+    border: 0px solid #30383e;
+}
+
+.pace,
+.pace .pace-progress {
+    top: -3px;
+    z-index: 1;
+}

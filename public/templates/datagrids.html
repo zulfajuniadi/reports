@@ -1,0 +1,265 @@
+<div class="container">
+    <h2 class="mb-3">Data Grids</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="float-right">
+                        <button class="btn btn-primary btn-sm" ng-click="createNewGrid()">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+                    Data Grids
+                </div>
+                <div class="list-group list-group-flush">
+                    <button ng-repeat="grid in dataGrids" class="text-left list-group-item list-group-flush"
+                        ui-sref="datagrids({grid_id: grid.id,field_id:null})"
+                        ng-class="{active:grid.id==currentGridId}">{{grid.name}}</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" ng-if="currentGridId">
+            <div class="card">
+                <div class="card-header">
+                    <div class="btn-group float-right">
+                        <button ng-click="viewGrid(grid.id)" class="btn btn-primary btn-sm">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                        <button async-button="saveGrid()" default-icon="'save'" class="btn btn-sm btn-info"></button>
+                        <button class="btn btn-danger btn-sm" async-button="deleteGrid()"
+                            default-icon="'trash'"></button>
+                    </div>
+                    {{grid.name}}
+                </div>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <div class="form-group">
+                            <label for="">Grid Title</label>
+                            <input type="text" class="form-control" ng-model="grid.name">
+                        </div>
+                        <div class="form-group">
+                            <label for="">View</label>
+                            <input type="text" class="form-control" ng-model="grid.view_name" disabled readonly>
+                        </div>
+                        <div class="custom-control custom-checkbox" ng-if="grid.fields.length">
+                            <input type="checkbox" class="custom-control-input" ng-model="grid.is_summary"
+                                id="customCheck6" ng-true-value="'1'" ng-false-value="'0'">
+                            <label class="custom-control-label" for="customCheck6">Is Summary</label>
+                        </div>
+                        <div ng-if="grid.fields.length&&grid.is_summary=='1'" class="mt-2">
+                            <div class="form-group">
+                                <label for="">Summary Type</label>
+                                <select class="form-control" ng-model="grid.summary_type">
+                                    <option value="{{type}}" ng-repeat="type in summaryTypes">
+                                        {{type}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Summary By Column</label>
+                                <select class="form-control" ng-model="grid.summary_by_column">
+                                    <option value="{{field.id}}" ng-repeat="field in grid.fields">
+                                        {{field.name}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Summary Count Column</label>
+                                <select class="form-control" ng-model="grid.summary_count_column">
+                                    <option value="{{field.id}}" ng-repeat="field in grid.fields">
+                                        {{field.name}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" ng-model="grid.has_sum_row"
+                                    id="customCheck9" ng-true-value="'1'" ng-false-value="'0'">
+                                <label class="custom-control-label" for="customCheck9">Has Row Sum</label>
+                            </div>
+                            <div class="custom-control custom-checkbox mt-2">
+                                <input type="checkbox" class="custom-control-input" ng-model="grid.has_sum_footer"
+                                    id="customCheck7" ng-true-value="'1'" ng-false-value="'0'">
+                                <label class="custom-control-label" for="customCheck7">Has Sum Footer</label>
+                            </div>
+                            <div class="custom-control custom-checkbox mt-2">
+                                <input type="checkbox" class="custom-control-input" ng-model="grid.has_grand_sum_footer"
+                                    id="customCheck8" ng-true-value="'1'" ng-false-value="'0'">
+                                <label class="custom-control-label" for="customCheck8">Has Grand Sum Footer</label>
+                            </div>
+                            <div class="custom-control custom-checkbox mt-2">
+                                <input type="checkbox" class="custom-control-input" ng-model="grid.has_drilldown"
+                                    id="customCheck10" ng-true-value="'1'" ng-false-value="'0'">
+                                <label class="custom-control-label" for="customCheck10">Has Drill Down</label>
+                            </div>
+                            <div class="form-group mt-2" ng-if="grid.has_drilldown=='1'">
+                                <label for="">Drill Down Report</label>
+                                <select class="form-control" ng-model="grid.drilldown_report_id">
+                                    <option value="{{report.id}}" ng-repeat="report in reports">
+                                        {{report.name}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group" ng-if="grid.has_drilldown=='1'">
+                                <label for="">Drill Down Filter</label>
+                                <textarea class="form-control" ng-model="grid.drilldown_filters" rows="8"></textarea>
+                            </div>
+                        </div>
+                        <div ng-if="grid.fields.length&&grid.is_summary=='0'" class="mt-2">
+                            <div class="form-group">
+                                <label for="">Default Sorting</label>
+                                <select class="form-control" ng-model="grid.sort_field_id">
+                                    <option value="">Columns</option>
+                                    <option value="{{field.id}}" ng-repeat="field in grid.fields">
+                                        {{field.name}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" ng-model="grid.sort_direction"
+                                        name="sort_direction" id="inlineRadio1" value="asc">
+                                    <label class="form-check-label" for="inlineRadio1">ASC</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" ng-model="grid.sort_direction"
+                                        name="sort_direction" id="inlineRadio2" value="desc">
+                                    <label class="form-check-label" for="inlineRadio2">DESC</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="custom-control custom-checkbox mt-2">
+                            <input type="checkbox" class="custom-control-input" ng-model="grid.is_enabled"
+                                id="customCheck1" ng-true-value="'1'" ng-false-value="'0'">
+                            <label class="custom-control-label" for="customCheck1">Is Enabled</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header" style="border-top: 1px solid rgba(0,0,0,.125); border-radius: 0px">
+                    <div class="float-right">
+                        <button class="btn btn-primary btn-sm" async-button="refreshFields()"
+                            default-icon="'sync'"></button>
+                    </div>
+                    Fields
+                </div>
+                <div class="list-group list-group-flush">
+                    <button class="text-left list-group-item list-group-flush"
+                        ng-repeat="field in grid.fields | orderBy:sort_order" ng-click="$parent.$parent.field = field"
+                        ng-class="{active:field.id==$parent.$parent.field.id}">
+                        <div class="float-right">
+                            <i ng-show="field.is_sortable=='1'" class="fa fa-sort-alpha-up"></i>
+                            <i ng-show="field.has_filter=='1'" class="fa fa-filter"></i>
+                        </div>
+                        <div ng-if="field.is_shown == '1'">{{field.name}}</div>
+                        <div ng-if="field.is_shown == '0'">
+                            <i class="text-muted">
+                                {{field.name}}
+                            </i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" ng-if="field.id">
+            <div class="card">
+                <div class="card-header">
+                    <div class="btn-group float-right">
+                        <button ng-disabled="!canMoveUp(field)" ng-click="moveUp()" class="btn btn-sm btn-primary">
+                            <i class="fa fa-arrow-up"></i>
+                        </button>
+                        <button ng-disabled="!canMoveDown(field)" ng-click="moveDown()" class="btn btn-sm btn-primary">
+                            <i class="fa fa-arrow-down"></i>
+                        </button>
+                    </div>
+                    <div ng-if="field.is_shown == '1'">{{field.name}}</div>
+                    <div ng-if="field.is_shown == '0'">
+                        <i class="text-muted">
+                            {{field.name}}
+                        </i>
+                    </div>
+                </div>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <div class="form-group">
+                            <label for="">Name</label>
+                            <input type="text" class="form-control" ng-model="field.name">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Field</label>
+                            <input type="text" class="form-control" ng-model="field.sys_name" disabled readonly>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" ng-model="field.is_shown"
+                                id="customCheck2" ng-true-value="'1'" ng-false-value="'0'">
+                            <label class="custom-control-label" for="customCheck2">Is Shown</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mt-2" ng-if="field.is_shown=='1'">
+                            <input type="checkbox" class="custom-control-input" ng-model="field.is_sortable"
+                                id="customCheck4" ng-true-value="'1'" ng-false-value="'0'">
+                            <label class="custom-control-label" for="customCheck4">Is Sortable</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mt-2" ng-if="field.is_shown=='1'">
+                            <input type="checkbox" class="custom-control-input" ng-model="field.has_filter"
+                                id="customCheck3" ng-true-value="'1'" ng-false-value="'0'">
+                            <label class="custom-control-label" for="customCheck3">Has Filter</label>
+                        </div>
+                        <div class="mt-2" ng-if="field.has_filter=='1'&&field.is_shown=='1'">
+                            <div class="form-group">
+                                <label for="">Filter Name</label>
+                                <input type="text" class="form-control" ng-model="field.filter_name">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Filter Type</label>
+                                <select class="form-control" ng-model="field.filter_type">
+                                    <option value="{{type}}" ng-repeat="type in filterTypes">{{type}}</option>
+                                </select>
+                            </div>
+                            <div class="custom-control custom-checkbox mt-2">
+                                <input type="checkbox" class="custom-control-input" ng-model="field.has_default_filter"
+                                    id="customCheck5" ng-true-value="'1'" ng-false-value="'0'">
+                                <label class="custom-control-label" for="customCheck5">Has Default Filter</label>
+                            </div>
+                            <div class="form-group mt-2" ng-if="field.has_default_filter=='1'">
+                                <label for="">Default Filter Value</label>
+                                <textarea ng-model="field.default_filter_value" rows="3"
+                                    class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="newGridModal" tabindex="-1" role="dialog" aria-labelledby="newGridLabel" aria-hidden="true"
+    ng-controller="NewGridController">
+    <div class="modal-dialog" role="document">
+        <form class="modal-content" name="newViewForm">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newGridLabel">New Data Grid</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="">View</label>
+                    <select name="view" ng-model="view_name" required class="form-control">
+                        <option ng-repeat="view in views" value="{{view}}">{{view}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="">Name</label>
+                    <input type="text" class="form-control" required ng-model="name">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" ng-show="newViewForm.$valid" ng-click="done()"
+                    data-dismiss="modal">Create Data
+                    Grid</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,121 @@
+<div class="container">
+    <h2 class="mb-3">Charts</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="float-right">
+                        <button class="btn btn-primary btn-sm" ng-click="createNewChart()">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+                    Charts
+                </div>
+                <div class="list-group list-group-flush">
+                    <button ng-repeat="chart in charts" class="text-left list-group-item list-group-flush"
+                        ui-sref="charts({chart_id: chart.id,field_id:null})"
+                        ng-class="{active:chart.id==$parent.chart.id}">{{chart.name}}</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" ng-if="chart.id">
+            <div class="card">
+                <div class="card-header">
+                    <div class="btn-group float-right">
+                        <button async-button="saveChart()" default-icon="'save'" class="btn btn-sm btn-info"></button>
+                        <button class="btn btn-danger btn-sm" async-button="deleteChart()"
+                            default-icon="'trash'"></button>
+                    </div>
+                    {{chart.name}}
+                </div>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <div class="form-group">
+                            <label for="">Chart Title</label>
+                            <input type="text" class="form-control" ng-model="chart.name">
+                        </div>
+                        <div class="form-group">
+                            <label for="">View</label>
+                            <input type="text" class="form-control" ng-model="chart.view_name" disabled readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Chart Type</label>
+                            <select class="form-control" ng-model="chart.type">
+                                <option value="{{type}}" ng-repeat="type in chartTypes">
+                                    {{type}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Background Color</label>
+                            <input type="color" class="form-control" ng-model="chart.bg_color">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Color Scheme</label>
+                            <div color-scheme="chart.color_scheme"></div>
+                        </div>
+                        <div class="custom-control custom-checkbox mb-2">
+                            <input type="checkbox" class="custom-control-input" ng-model="chart.label_pos"
+                                id="customCheck6" ng-true-value="'right'" ng-false-value="'left'">
+                            <label class="custom-control-label" for="customCheck6">Label Right</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Query</label>
+                            <textarea class="form-control" ng-model="chart.query"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Labels</label>
+                            <textarea class="form-control" ng-model="chart.labels"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Data Sets</label>
+                            <textarea class="form-control" ng-model="chart.datasets"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" ng-if="chart.id">
+            <div class="chart-container" ng-style="{'background-color': chart.bg_color}">
+                <div class="chart-title text-light"
+                    ng-class="{absleft: chart.label_pos=='left', absright: chart.label_pos=='right'}">
+                    {{chart.name}}
+                </div>
+                <button class="btn btn-sm reload-btn" async-button="refreshData()" default-icon="'sync'"
+                    ng-class="{absleft: chart.label_pos=='left', absright: chart.label_pos=='right'}"></button>
+                <canvas chart-js="chart" data="chartData" height="300px"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="newGridModal" tabindex="-1" role="dialog" aria-labelledby="newGridLabel" aria-hidden="true"
+    ng-controller="NewGridController">
+    <div class="modal-dialog" role="document">
+        <form class="modal-content" name="newViewForm">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newGridLabel">New Chart</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="">View</label>
+                    <select name="view" ng-model="view_name" required class="form-control">
+                        <option ng-repeat="view in views" value="{{view}}">{{view}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="">Name</label>
+                    <input type="text" class="form-control" required ng-model="name">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" ng-show="newViewForm.$valid" ng-click="done()"
+                    data-dismiss="modal">Create New Chart</button>
+            </div>
+        </form>
+    </div>
+</div>

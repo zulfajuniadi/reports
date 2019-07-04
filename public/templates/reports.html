@@ -1,0 +1,346 @@
+<div class="container-fluid">
+    <div class="float-right">
+        <div class="form-row">
+            <div class="btn-group">
+                <select class="form-control" ng-model="selectedReportId" ng-change="showReport(selectedReportId)" id=""
+                    style="width:200px">
+                    <option value="{{report.id}}" ng-repeat="report in reports">{{report.name}}</option>
+                </select>
+                <button class="btn btn-info" ng-click="createNewReport()">
+                    <i class="fa fa-plus"></i>
+                </button>
+                <button ng-if="report.id" class="btn btn-info" ng-click="editReport()">
+                    <i class="fa fa-edit"></i>
+                </button>
+                <button ng-if="report.id" class="btn btn-primary" ng-click="saveReport()">
+                    <i class="fa fa-save"></i>
+                </button>
+                <button ng-if="report.id" class="btn btn-danger" ng-click="deleteReport()">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <h3 class="mb-0">{{report.name||'Reports'}}<br /><small ng-if="report.description">{{report.description}}</small>
+    </h3>
+    <div ng-if="report.data" class="mt-3">
+        <div ng-if="report.type=='Charts only'">
+            <div class="row" ng-repeat="row in report.data.rows">
+                <div class="col-md-{{col.width}} mt-2" ng-style="{height: row.height+'px'}" ng-repeat="col in row.cols">
+                    <div style="height: 100%" class="col-wrapper">
+                        <div ng-if="!col.id">
+                            <h4 class="mt-4 mb-3">Choose Chart:</h4>
+                            <select ng-model="col.id" class="form-control">
+                                <option value="{{chart.id}}" ng-repeat="chart in charts">{{chart.name}}</option>
+                            </select>
+                            <button class="btn btn-danger mt-3 btn-sm"
+                                ng-click="row.cols.splice(row.cols.indexOf(col), 1)">Remove
+                                Slot</button>
+                            <button ng-if="row.cols.length==1" class="btn btn-danger mt-3 btn-sm"
+                                ng-click="report.data.rows.splice(report.data.rows.indexOf(row), 1)">Remove
+                                Row</button>
+                        </div>
+                        <div ng-init="col=col;row=row" ng-if="col.id" ng-controller="ChartController"
+                            class="chart-container" height="100%" ng-style="{'background-color': chart.bg_color}">
+                            <div ng-if="chart.id" class="chart-title text-light"
+                                ng-class="{absleft: chart.label_pos=='left', absright: chart.label_pos=='right'}">
+                                {{chart.name}}
+                            </div>
+                            <button ng-if="chart.id" class="btn btn-sm reload-btn" async-button="refreshData()"
+                                default-icon="'sync'"
+                                ng-class="{absleft: chart.label_pos=='left', absright: chart.label_pos=='right'}"></button>
+                            <canvas chart-js="chart" data="chartData" height="{{row.height+'px'}}"></canvas>
+                            <div class="col-controls btn-group"
+                                ng-class="{absright: chart.label_pos=='left', absleft: chart.label_pos=='right'}">
+                                <button class="btn btn-info btn-sm" ng-click="editCol(col, row)">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button ui-sref="charts({chart_id:chart.id})" class="btn btn-info btn-sm">
+                                    <i class="fa fa-cogs"></i>
+                                </button>
+                                <button ng-click="col.id=null" class="btn btn-danger btn-sm">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mt-2" ng-if="canAddChart(row)" ng-style="{height: row.height+'px'}">
+                    <button class="btn-sm btn-block btn btn-primary" style="height:100%" ng-click="addChart(row, 3)">
+                        <i class="fa fa-plus"></i> Add Chart
+                    </button>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-3">
+                    <button class="btn-sm btn-block btn btn-primary" ng-click="addRow()">
+                        <i class="fa fa-plus"></i> Add Row
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div ng-if="report.type=='Grid with charts on the left'">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="row" ng-repeat="row in report.data.rows">
+                        <div class="col-md-{{col.width}} mt-2" ng-style="{height: row.height+'px'}"
+                            ng-repeat="col in row.cols">
+                            <div style="height: 100%" class="col-wrapper">
+                                <div ng-if="!col.id">
+                                    <h4 class="mt-4 mb-3">Choose Chart:</h4>
+                                    <select ng-model="col.id" class="form-control">
+                                        <option value="{{chart.id}}" ng-repeat="chart in charts">{{chart.name}}</option>
+                                    </select>
+                                    <button class="btn btn-danger mt-3 btn-sm"
+                                        ng-click="row.cols.splice(row.cols.indexOf(col), 1)">Remove
+                                        Slot</button>
+                                    <button ng-if="row.cols.length==1" class="btn btn-danger mt-3 btn-sm"
+                                        ng-click="report.data.rows.splice(report.data.rows.indexOf(row), 1)">Remove
+                                        Row</button>
+                                </div>
+                                <div ng-init="col=col;row=row" ng-if="col.id" ng-controller="ChartController"
+                                    class="chart-container" height="100%"
+                                    ng-style="{'background-color': chart.bg_color}">
+                                    <div ng-if="chart.id" class="chart-title text-light"
+                                        ng-class="{absleft: chart.label_pos=='left', absright: chart.label_pos=='right'}">
+                                        {{chart.name}}
+                                    </div>
+                                    <button ng-if="chart.id" class="btn btn-sm reload-btn" async-button="refreshData()"
+                                        default-icon="'sync'"
+                                        ng-class="{absleft: chart.label_pos=='left', absright: chart.label_pos=='right'}"></button>
+                                    <canvas chart-js="chart" data="chartData" height="{{row.height+'px'}}"></canvas>
+                                    <div class="col-controls btn-group"
+                                        ng-class="{absright: chart.label_pos=='left', absleft: chart.label_pos=='right'}">
+                                        <button class="btn btn-info btn-sm" ng-click="editCol(col, row)">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                        <button ui-sref="charts({chart_id:chart.id})" class="btn btn-info btn-sm">
+                                            <i class="fa fa-cogs"></i>
+                                        </button>
+                                        <button ng-click="col.id=null" class="btn btn-danger btn-sm">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-2" ng-if="canAddChart(row)" ng-style="{height: row.height+'px'}">
+                            <button class="btn-sm btn-block btn btn-primary" style="height:100%"
+                                ng-click="addChart(row, 12)">
+                                <i class="fa fa-plus"></i> Add Chart
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <button class="btn-sm btn-block btn btn-primary" ng-click="addRow()">
+                                <i class="fa fa-plus"></i> Add Row
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div ng-if="!report.data.grid.id" class="row">
+                        <div class="col-md-6">
+                            <h4 class="mb-3">Choose Grid:</h4>
+                            <select ng-model="report.data.grid.id" class="form-control">
+                                <option value="{{grid.id}}" ng-repeat="grid in dataGrids">{{grid.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div ng-if="report.data.grid.id" ng-init="grid=report.data.grid" ng-controller="GridController">
+                        <div ng-if="gridData.id">
+                            <div class="float-right">
+                                <button class="btn btn-danger btn-sm" ng-click="report.data.grid.id=null">
+                                    Remove Grid
+                                </button>
+                            </div>
+                            <h4>{{gridData.name}}</h4>
+                            <div ng-style="{height: $parent.height + 'px'}" class="mock-grid mt-3">
+                                <p class="mt-1 ml-2"><i>Table will be rendered here</i></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-if="report.type=='Grid with charts on the right'">
+            <div class="row">
+                <div class="col-md-9">
+                    <div ng-if="!report.data.grid.id" class="row">
+                        <div class="col-md-6">
+                            <h4 class="mb-3">Choose Grid:</h4>
+                            <select ng-model="report.data.grid.id" class="form-control">
+                                <option value="{{grid.id}}" ng-repeat="grid in dataGrids">{{grid.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div ng-if="report.data.grid.id" ng-init="grid=report.data.grid" ng-controller="GridController">
+                        <div ng-if="gridData.id">
+                            <div class="float-right">
+                                <button class="btn btn-danger btn-sm" ng-click="report.data.grid.id=null">
+                                    Remove Grid
+                                </button>
+                            </div>
+                            <h4>{{gridData.name}}</h4>
+                            <div ng-style="{height: $parent.height + 'px'}" class="mock-grid mt-3">
+                                <p class="mt-1 ml-2"><i>Table will be rendered here</i></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="row" ng-repeat="row in report.data.rows">
+                        <div class="col-md-{{col.width}} mt-2" ng-style="{height: row.height+'px'}"
+                            ng-repeat="col in row.cols">
+                            <div style="height: 100%" class="col-wrapper">
+                                <div ng-if="!col.id">
+                                    <h4 class="mt-4 mb-3">Choose Chart:</h4>
+                                    <select ng-model="col.id" class="form-control">
+                                        <option value="{{chart.id}}" ng-repeat="chart in charts">{{chart.name}}</option>
+                                    </select>
+                                    <button class="btn btn-danger mt-3 btn-sm"
+                                        ng-click="row.cols.splice(row.cols.indexOf(col), 1)">Remove
+                                        Slot</button>
+                                    <button ng-if="row.cols.length==1" class="btn btn-danger mt-3 btn-sm"
+                                        ng-click="report.data.rows.splice(report.data.rows.indexOf(row), 1)">Remove
+                                        Row</button>
+                                </div>
+                                <div ng-init="col=col;row=row" ng-if="col.id" ng-controller="ChartController"
+                                    class="chart-container" height="100%"
+                                    ng-style="{'background-color': chart.bg_color}">
+                                    <div ng-if="chart.id" class="chart-title text-light"
+                                        ng-class="{absleft: chart.label_pos=='left', absright: chart.label_pos=='right'}">
+                                        {{chart.name}}
+                                    </div>
+                                    <button ng-if="chart.id" class="btn btn-sm reload-btn" async-button="refreshData()"
+                                        default-icon="'sync'"
+                                        ng-class="{absleft: chart.label_pos=='left', absright: chart.label_pos=='right'}"></button>
+                                    <canvas chart-js="chart" data="chartData" height="{{row.height+'px'}}"></canvas>
+                                    <div class="col-controls btn-group"
+                                        ng-class="{absright: chart.label_pos=='left', absleft: chart.label_pos=='right'}">
+                                        <button class="btn btn-info btn-sm" ng-click="editCol(col, row)">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                        <button ui-sref="charts({chart_id:chart.id})" class="btn btn-info btn-sm">
+                                            <i class="fa fa-cogs"></i>
+                                        </button>
+                                        <button ng-click="col.id=null" class="btn btn-danger btn-sm">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-2" ng-if="canAddChart(row)" ng-style="{height: row.height+'px'}">
+                            <button class="btn-sm btn-block btn btn-primary" style="height:100%"
+                                ng-click="addChart(row, 12)">
+                                <i class="fa fa-plus"></i> Add Chart
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <button class="btn-sm btn-block btn btn-primary" ng-click="addRow()">
+                                <i class="fa fa-plus"></i> Add Row
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-if="report.type=='Grid only'">
+            <div ng-if="!report.data.grid.id" class="row">
+                <div class="col-md-6">
+                    <h4 class="mb-3">Choose Grid:</h4>
+                    <select ng-model="report.data.grid.id" class="form-control">
+                        <option value="{{grid.id}}" ng-repeat="grid in dataGrids">{{grid.name}}</option>
+                    </select>
+                </div>
+            </div>
+            <div ng-if="report.data.grid.id" ng-init="grid=report.data.grid" ng-controller="GridController">
+                <div ng-if="gridData.id">
+                    <div class="float-right">
+                        <button class="btn btn-danger btn-sm" ng-click="report.data.grid.id=null">
+                            Remove Grid
+                        </button>
+                    </div>
+                    <div ng-style="{height: $parent.height + 40 + 'px'}" class="mock-grid mt-3">
+                        <p class="mt-1 ml-2"><i>Table "{{gridData.name}}" will be rendered here</i></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="newReportModal" tabindex="-1" role="dialog" aria-labelledby="newReportLabel"
+    aria-hidden="true" ng-controller="NewReportController">
+    <div class="modal-dialog" role="document">
+        <form class="modal-content" name="newReportForm">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newReportLabel">Report</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="">Name</label>
+                    <input type="text" class="form-control" required ng-model="name">
+                </div>
+                <div class="form-group">
+                    <label for="">Type</label>
+                    <select name="view" ng-model="type" required class="form-control">
+                        <option ng-repeat="type in reportTypes" value="{{type}}">{{type}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="">Description</label>
+                    <textarea class="form-control" ng-model="description"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" ng-show="newReportForm.$valid" ng-click="done()"
+                    data-dismiss="modal">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="colModal" tabindex="-1" role="dialog" aria-labelledby="colModalLabel" aria-hidden="true"
+    ng-controller="ColumnModalController">
+    <div class="modal-dialog" role="document">
+        <form class="modal-content" name="colModal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="colModalLabel">Edit Column</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="">Column Width</label>
+                    <input type="number" step="1" max="12" class="form-control" required ng-model="data.column.width">
+                    <div class="help-text">
+                        Must be between 1 and 12
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="">Row Height</label>
+                    <input type="number" min="10" max="1000" step="10" class="form-control" required
+                        ng-model="data.row.height">
+                    <div class="help-text">
+                        Must be between 10px and 1000px
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" ng-show="colModal.$valid" ng-click="done()"
+                    data-dismiss="modal">Save</button>
+            </div>
+        </form>
+    </div>
+</div>

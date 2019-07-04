@@ -1,0 +1,10 @@
+- add color scheme to table
+- drill down
+- backend export
+
+DEPLOYMENT
+ - pull, install, make links
+ - reroute reports
+ - create views
+ - index table ticket_histories
+ - auth

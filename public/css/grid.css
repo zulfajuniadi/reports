@@ -1,0 +1,99 @@
+[ng\:cloak],
+[ng-cloak],
+[data-ng-cloak],
+[x-ng-cloak],
+.ng-cloak,
+.x-ng-cloak {
+    display: none !important;
+}
+
+th {
+    white-space: nowrap;
+}
+
+th.sortable:hover {
+    cursor: pointer;
+}
+
+table.table {
+    margin-bottom: 0px;
+}
+
+table * {
+    font-size: 12px;
+}
+
+table th {
+    min-width: 32px;
+}
+
+.pagination {
+    font-size: 12px;
+}
+
+.filter-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.filter-pane {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 300px;
+    padding: 10px;
+    bottom: 0px;
+    z-index: 1;
+    border: 1px solid #ccc;
+    background-color: #ffffffed;
+    transform: translateX(300px);
+    transition-duration: 300ms;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.filter-pane.show {
+    transform: translateX(0px);
+}
+
+.table-wrapper {
+    overflow-y: auto;
+    overflow-x: auto;
+    margin-bottom: 0px;
+    border: 1px solid #ccc;
+}
+
+.loading-blocker {
+    position: absolute;
+    z-index: 100;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    text-align: center;
+    vertical-align: middle;
+    background-color: #000000a1;
+    color: white;
+    padding-top: 240px;
+    font-size: 40px;
+}
+
+.filter-pane .list-group-item ul {
+    margin-bottom: 0px;
+}
+
+.list-group-item:hover .filter-item-btns .btn {
+    display: inline-block;
+}
+
+.list-group-item .filter-item-btns .btn {
+    display: none;
+    width: 20px;
+    height: 20px;
+    padding: 0px;
+    font-size: 10px;
+}
+
+#filters button {
+    width: 97px;
+}
