@@ -58,6 +58,17 @@ class ReportController extends Controller
         return view('report', compact('report', 'menus', 'renderer', 'gridTitle', 'exportUrl'));
     }
 
+    public function getHeaders($slug)
+    {
+        $report = Report::whereSlug($slug)->firstOrFail();
+        $report->data = json_decode($report->data);
+        if ($report->data && $report->data->grid && $report->data->grid->id && $grid = Datagrid::find($report->data->grid->id)) {
+            $renderer = new GridRenderer($grid);
+            return $renderer->getHeaders();
+        }
+        abort(404);
+    }
+
     public function getBody($slug)
     {
         $report = Report::whereSlug($slug)->firstOrFail();

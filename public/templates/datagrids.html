@@ -63,7 +63,7 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" ng-if="grid.summary_type=='Month'">
                                 <label for="">Summary Count Column</label>
                                 <select class="form-control" ng-model="grid.summary_count_column">
                                     <option value="{{field.id}}" ng-repeat="field in grid.fields">

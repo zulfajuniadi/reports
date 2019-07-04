@@ -36,14 +36,19 @@ class Table
 
     protected function generateThead()
     {
-        $this->thead =  '<thead><tr class="bg-dark text-white">';
+        $this->thead =  [];
         foreach ($this->grid->fields()->orderBy('sort_order')->get() as $field) {
             if ($field->is_shown) {
                 if ($field->is_sortable && !$this->grid->is_summary) {
-                    $this->thead .= '<th class="sortable" onclick="sort(\''. $field->sys_name .'\')">' . $field->name . '</th>';
+                    $this->thead[] = [
+                        'sort' => $field->sys_name,
+                        'content' => $field->name
+                    ];
                     $this->columnCount++;
                 } else {
-                    $this->thead .= '<th>' . $field->name . '</th>';
+                    $this->thead[] = [
+                        'content' => $field->name
+                    ];
                     $this->columnCount++;
                 }
             }
@@ -51,16 +56,19 @@ class Table
         if ($this->grid->is_summary) {
             if ($this->grid->summary_type == 'Month') {
                 foreach ($this->months as $month) {
-                    $this->thead .= '<th>' . $month . '</th>';
+                    $this->thead[] = [
+                        'content' => $field->name
+                    ];
                     $this->columnCount++;
                 }
                 if ($this->grid->has_sum_row) {
-                    $this->thead .= '<th>Sum</th>';
+                    $this->thead[] = [
+                        'content' => 'Sum'
+                    ];
                     $this->columnCount++;
                 }
             }
         }
-        $this->thead .= '</tr></thead>';
     }
     
     protected function generateTbody($skipLinks = false)
@@ -82,7 +90,12 @@ class Table
                 } else {
                     $rawQuery->where($field->sys_name, $value);
                 }
-            } elseif ($field->has_default_filter && $value = eval($field->default_filter_value)) {
+
+            } elseif ($field->has_default_filter) {
+                $value = $field->default_filter_value;
+                if(strstr($value, 'return ')) {
+                    $value = eval($field->default_filter_value);
+                }
                 if ($field->filter_type == 'Search') {
                     $value = strtolower($value);
                     $rawQuery->where($field->sys_name, 'like', "%{$value}%");
@@ -238,7 +251,7 @@ class Table
             })->toArray();
         }
 
-        $this->tbody =  '<tbody>';
+        $this->tbody =  '';
         foreach ($data as $rowIndex => $row) {
             if (count($data) > 0) {
                 if ($this->grid->is_summary) {
@@ -330,14 +343,22 @@ class Table
         if (count($data) == 0) {
             $this->tbody .= '<tr><td class="text-center" colspan="' . $this->columnCount . '"><i>No Data</i></td>';
         }
-
-        $this->tbody .= '</tbody>';
     }
 
-    public function generate($skipLinks = false)
+    public function build($skipLinks = false)
+    {
+        $this->generateTbody($skipLinks);
+    }
+
+    public function getHeaders()
     {
         $this->generateThead();
-        $this->generateTbody($skipLinks);
-        return $this->thead . $this->tbody;
+        return $this->thead;
+    }
+
+    public function getBody($skipLinks = false)
+    {
+        $this->build($skipLinks);
+        return $this->tbody;
     }
 }

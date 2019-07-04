@@ -35,7 +35,7 @@ angular.module('Report', [])
     })
 
 
-    .controller('FilterController', function ($scope, $http) {
+    .controller('FilterController', function ($scope, $http, $interpolate, $sce) {
         $scope.newFilterType = null;
         $scope.newFilterValue = [];
         $scope.filters = [];
@@ -45,27 +45,45 @@ angular.module('Report', [])
         $scope.status = 'Loading...';
         $scope.editingFilter = {};
         $scope.editingFilterSource = {};
+        $scope.tbody = '';
+        $scope.headers = [];
+        $scope.currentSort = null;
+        $scope.currentSortDir = 'asc';
         $http.get(window.location.origin + window.location.pathname + '/filters' + window.location.search)
             .then(function (response) {
-                $scope.filters = JSON.parse(JSON.stringify(response.data));
-                $scope.availableFilters = JSON.parse(JSON.stringify(response.data));
+                $scope.filters = Object.deepCopy(response.data);
+                $scope.availableFilters = Object.deepCopy(response.data);
                 $scope.status = 'Filters';
                 parseQueryString();
+                response.data.forEach(function(filter){ 
+                    if(filter.is_default) {
+                        $scope.defaultFilters.push({
+                            field: filter.field,
+                            type: filter.type,
+                            name: filter.name,
+                            value: filter.value,
+                        });
+                    } 
+                });
+                $scope.defaultFilters.forEach(function(defaultFilter){
+                    var found = $scope.appliedFilters.filter(function(appliedFilter){
+                        return appliedFilter.name == defaultFilter.name;
+                    }).pop();
+                    if(!found) {
+                        $scope.appliedFilters.push({
+                            field: defaultFilter.field,
+                            type: defaultFilter.type,
+                            name: defaultFilter.name,
+                            value: defaultFilter.value
+                        });
+                    }
+                });
+                
                 if (location.search.length < 2) {
-                    $scope.filters.forEach(function (filter) {
-                        if (filter.value) {
-                            $scope.appliedFilters.push({
-                                field: filter.field,
-                                type: filter.type,
-                                name: filter.name,
-                                values: filter.value
-                            });
-                        }
-                    });
-                    $scope.defaultFilters = JSON.parse(JSON.stringify(angular.copy($scope.appliedFilters)));
                     $scope.runFilter(true);
                 }
                 hideAppliedFilters();
+                $scope.refreshTable();
             });
 
         function parseQueryString() {
@@ -76,9 +94,9 @@ angular.module('Report', [])
                 if (parts.length == 2) {
                     var key = decodeURIComponent(parts[0]);
                     if (parts[0] == 'sort_by_column') {
-                        currentSort = parts[1];
-                    } else if (parts[0] == 'sort_by_column') {
-                        currentSortDir = parts[1];
+                        $scope.currentSort = parts[1];
+                    } else if (parts[0] == 'sort_by_direction') {
+                        $scope.currentSortDir = parts[1];
                     } else if (key.indexOf('[]') > -1) {
                         key = key.substr(0, key.length - 2);
                         if (!filters[key]) {
@@ -97,7 +115,7 @@ angular.module('Report', [])
                             field: filter.field,
                             type: filter.type,
                             name: filter.name,
-                            values: filters[key]
+                            value: filters[key]
                         });
                     }
                 });
@@ -109,7 +127,7 @@ angular.module('Report', [])
                 field: $scope.newFilterType.field,
                 type: $scope.newFilterType.type,
                 name: $scope.newFilterType.name,
-                values: $scope.newFilterValue
+                value: $scope.newFilterValue
             });
             $scope.newFilterType = null;
             $scope.newFilterValue = [];
@@ -133,23 +151,20 @@ angular.module('Report', [])
         $scope.runFilter = function (replaceHistory) {
             var qs = [];
             $scope.appliedFilters.forEach(function (filter) {
-                if (!filter.values) {
-                    return;
-                }
                 switch (filter.type) {
                     case 'Drop Down':
                     case 'Search':
-                        var val = encodeURIComponent(filter.values);
+                        var val = encodeURIComponent(filter.value);
                         qs.push(`${filter.field}=${val}`);
                         break;
                     case 'Multiple Drop Down':
-                        filter.values.forEach(function (val) {
+                        filter.value.forEach(function (val) {
                             val = encodeURIComponent(val);
                             qs.push(`${filter.field}[]=${val}`);
                         });
                         break;
                     case 'Date Range':
-                        filter.values.forEach(function (val) {
+                        filter.value.forEach(function (val) {
                             val = encodeURIComponent(val);
                             qs.push(`${filter.field}[]=${val}`);
                         });
@@ -159,7 +174,7 @@ angular.module('Report', [])
                 }
             });
 
-            if (currentSort) {
+            if ($scope.currentSort) {
                 var foundIndex = -1;
                 qs.forEach(function (params, index) {
                     if (params.indexOf('sort_by_column') > -1) {
@@ -178,8 +193,8 @@ angular.module('Report', [])
                 if (foundIndex > -1) {
                     qs.splice(foundIndex, 1);
                 }
-                qs.push('sort_by_column=' + currentSort);
-                qs.push('sort_by_direction=' + currentSortDir);
+                qs.push('sort_by_column=' + $scope.currentSort);
+                qs.push('sort_by_direction=' + $scope.currentSortDir);
             } else {
                 var foundIndex = -1;
                 qs.forEach(function (params, index) {
@@ -210,13 +225,13 @@ angular.module('Report', [])
                 window.history.replaceState({}, document.title, window.location.origin + window.location.pathname + qs);
             } else {
                 window.history.pushState({}, document.title, window.location.origin + window.location.pathname + qs);
-                refreshTable();
+                $scope.refreshTable();
             }
         }
 
         $scope.clearFilters = function () {
-            $scope.appliedFilters = JSON.parse(JSON.stringify(angular.copy($scope.defaultFilters)));
-            $scope.availableFilters = JSON.parse(JSON.stringify(angular.copy($scope.filters)));
+            $scope.appliedFilters = Object.deepCopy(angular.copy($scope.defaultFilters));
+            $scope.availableFilters = Object.deepCopy(angular.copy($scope.filters));
             hideAppliedFilters();
         }
 
@@ -230,7 +245,7 @@ angular.module('Report', [])
             });
             if (foundIndex > -1) {
                 $scope.availableFilters.push(
-                    JSON.parse(JSON.stringify(angular.copy($scope.filters[foundIndex])))
+                    Object.deepCopy(angular.copy($scope.filters[foundIndex]))
                 );
             }
         }
@@ -244,7 +259,7 @@ angular.module('Report', [])
             });
             if (foundIndex > -1) {
                 $scope.editingFilter = filter;
-                $scope.editingFilterSource = JSON.parse(JSON.stringify(angular.copy($scope.filters[foundIndex])));
+                $scope.editingFilterSource = Object.deepCopy(angular.copy($scope.filters[foundIndex]));
             }
         }
 
@@ -253,19 +268,17 @@ angular.module('Report', [])
             $scope.editingFilterSource = {};
         }
 
-        var currentSort = null;
-        var currentSortDir = 'asc';
         $scope.sort = function (column) {
-            if (currentSort != column) {
-                currentSort = column;
-                currentSortDir = 'asc';
+            if ($scope.currentSort != column) {
+                $scope.currentSort = column;
+                $scope.currentSortDir = 'asc';
             } else {
-                switch (currentSortDir) {
+                switch ($scope.currentSortDir) {
                     case 'asc':
-                        currentSortDir = 'desc';
+                        $scope.currentSortDir = 'desc';
                         break;
                     case 'desc':
-                        currentSort = null;
+                        $scope.currentSort = null;
                         break;
                 }
             }
@@ -281,6 +294,24 @@ angular.module('Report', [])
         function updateDownloadLink() {
             $('#downloadLink').attr('href', window.location.origin + window.location.pathname + '/download' + location.search);
         }
+
+        $scope.refreshTable = function refreshTable () {
+            $('.loading-blocker').show();
+            $http.get(window.location.origin + window.location.pathname + '/body' + window.location.search).then(function(response){
+                    var html = $interpolate(response.data)($scope);
+                    $scope.tbody = $sce.trustAsHtml(html);
+                    $('.loading-blocker').hide();
+                    $scope.$applyAsync();
+            },function(){
+                $('.loading-blocker').hide();
+            })
+        }
+
+        $http.get(window.location.origin + window.location.pathname + '/headers' + window.location.search).then(function(response){
+            $scope.headers = response.data;
+            $scope.$applyAsync();
+        })
+
         updateDownloadLink();
     })
 
@@ -365,7 +396,7 @@ angular.module('Report', [])
                     $element.parent().removeClass('no-data');
                     switch ($scope.chartJs.type) {
                         case 'Pie Chart':
-                            var opts = JSON.parse(JSON.stringify(chartOpts.doughnut));
+                            var opts = Object.deepCopy(chartOpts.doughnut);
                             opts.plugins.colorschemes.scheme = $scope.chartJs.color_scheme;
                             chart = new Chart(ctx, {
                                 type: 'pie',
@@ -380,7 +411,7 @@ angular.module('Report', [])
                             });
                             break;
                         case 'Doughnut Chart':
-                            var opts = JSON.parse(JSON.stringify(chartOpts.doughnut));
+                            var opts = Object.deepCopy(chartOpts.doughnut);
                             opts.plugins.colorschemes.scheme = $scope.chartJs.color_scheme;
                             chart = new Chart(ctx, {
                                 type: 'doughnut',
@@ -402,7 +433,7 @@ angular.module('Report', [])
                                     data: [val]
                                 })
                             })
-                            var opts = JSON.parse(JSON.stringify(chartOpts.bar));
+                            var opts = Object.deepCopy(chartOpts.bar);
                             opts.plugins.colorschemes.scheme = $scope.chartJs.color_scheme;
                             chart = new Chart(ctx, {
                                 type: 'bar',
@@ -456,10 +487,10 @@ angular.module('Report', [])
                             });
 
                             var type = 'bar';
-                            var opts = JSON.parse(JSON.stringify(chartOpts.stackedBar));
+                            var opts = Object.deepCopy(chartOpts.stackedBar);
                             if ($scope.chartJs.type == 'Line Chart') {
                                 type = 'line';
-                                opts = JSON.parse(JSON.stringify(chartOpts.line));
+                                opts = Object.deepCopy(chartOpts.line);
                                 datasets.forEach(function (set) {
                                     set.fill = false;
                                 })

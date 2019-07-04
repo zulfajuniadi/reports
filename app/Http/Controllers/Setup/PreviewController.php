@@ -21,7 +21,7 @@ class PreviewController extends Controller
 
     public function showGrid()
     {
-        return view('setup.preview.grid', [
+        return view('setup.preview', [
             'grid' => $this->grid,
             'renderer' => $this->renderer,
         ]);
@@ -32,17 +32,13 @@ class PreviewController extends Controller
         return $this->renderer->getFilters();
     }
 
+    public function getHeaders()
+    {
+        return $this->renderer->getHeaders();
+    }
+
     public function getBody()
     {
         return $this->renderer->getBody();
-    }
-
-    public function getDump()
-    {
-        return view('setup.preview.dump', [
-            'title' => $this->grid->title,
-            'grid' => $this->grid,
-            'renderer' => $this->renderer,
-        ]);
     }
 }

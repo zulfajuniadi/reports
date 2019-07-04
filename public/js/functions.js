@@ -1,3 +1,7 @@
+Object.deepCopy = function deepCopy(source) {
+    return JSON.parse(JSON.stringify(source));
+}
+
 function makeid(length) {
     var length = length || 16;
     var result = '';

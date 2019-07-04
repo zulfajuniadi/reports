@@ -10,26 +10,13 @@ class GridRenderer
 {
     protected $grid;
     protected $params;
+    protected $table;
 
     public function __construct(Datagrid $grid)
     {
         $this->grid = $grid;
+        $this->table = new Table($grid);
         $this->params = request()->all();
-    }
-    
-    public function renderFilters()
-    {
-        return view('grid.partials.filters', ['grid' => $this->grid]);
-    }
-
-    public function renderBody()
-    {
-        return view('grid.partials.body-ajax', ['grid' => $this->grid]);
-    }
-
-    public function renderScripts()
-    {
-        return view('grid.partials.scripts', ['grid' => $this->grid]);
     }
 
     public function render($title = '', $render_header = true)
@@ -45,18 +32,14 @@ class GridRenderer
         return view('grid.grid', $viewData);
     }
 
-    public function getBody($skipLinks = false)
+    public function getHeaders()
     {
-        return (new Table($this->grid))->generate($skipLinks);
+        return $this->table->getHeaders();
     }
 
-    public function dump()
+    public function getBody($skipLinks = false)
     {
-        return view('grid.dump', [
-            'title' => $this->grid->name,
-            'grid' => $this->grid,
-            'renderer' => $this
-        ]);
+        return $this->table->getBody($skipLinks);
     }
 
     public function getFilters()
@@ -73,10 +56,14 @@ class GridRenderer
                     'name' => $field->filter_name,
                     'field' => $field->sys_name,
                     'type' => $field->filter_type,
-                    'values' => $values
+                    'values' => $values,
+                    'is_default' => $field->has_default_filter == 1
                 ];
-                if ($field->default_filter_value) {
-                    $filter['value'] = eval($field->default_filter_value);
+                if ($field->has_default_filter) {
+                    $filter['value'] = $field->default_filter_value;
+                    if(strstr($field->default_filter_value, 'return ')) {
+                        $filter['value'] = eval($field->default_filter_value);
+                    }
                 }
                 $filters[$field->sys_name] = $filter;
             }
@@ -95,7 +82,6 @@ class GridRenderer
 
             foreach ($plucks as $pluck) {
                 $values = $result->pluck($pluck)->unique()->toArray();
-                $values = array_filter($values);
                 sort($values);
                 $filters[$pluck]['values'] = $values;
             }

@@ -74,7 +74,6 @@ table th {
     vertical-align: middle;
     background-color: #000000a1;
     color: white;
-    padding-top: 240px;
     font-size: 40px;
 }
 
@@ -96,4 +95,12 @@ table th {
 
 #filters button {
     width: 97px;
+}
+
+th.sortable.sortdown:before {
+    content: '▼';
+}
+
+th.sortable.sortup:before {
+    content: '▲';
 }

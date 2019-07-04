@@ -13,6 +13,7 @@
 
 Route::get('/', 'ReportController@index')->name('home');
 Route::get('/reports/{slug}', 'ReportController@report')->name('report');
+Route::get('/reports/{slug}/headers', 'ReportController@getHeaders');
 Route::get('/reports/{slug}/body', 'ReportController@getBody');
 Route::get('/reports/{slug}/filters', 'ReportController@getFilters');
 Route::get('/reports/{slug}/download', 'ReportController@export')->name('download');
@@ -54,6 +55,7 @@ Route::group(['namespace' => 'Setup', 'prefix' => 'setup'], function () {
 
     Route::get('/preview/chart-data/{id}', 'PreviewController@getChartData');
     Route::get('/preview/grid/{id}', 'PreviewController@showGrid');
+    Route::get('/preview/grid/{id}/headers', 'PreviewController@getHeaders');
     Route::get('/preview/grid/{id}/body', 'PreviewController@getBody');
     Route::get('/preview/grid/{id}/dump', 'PreviewController@getDump');
     Route::get('/preview/grid/{id}/filters', 'PreviewController@getFilters');
