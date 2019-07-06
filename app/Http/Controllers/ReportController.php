@@ -15,18 +15,17 @@ class ReportController extends Controller
 {
     public function index()
     {
-        $menus = Menu::whereType('report')
+        $menus = app(Menu::class)->all()
+            ->where('type', 'report')
             ->whereNotIn('href', ['#', ''])
-            ->whereNotNull('href')
-            ->orderBy('parent_id')
-            ->orderBy('sort_index')
-            ->get();
+            ->sortBy('parent_id')
+            ->sortBy('sort_index');
         $report = null;
         foreach ($menus as $menu) {
             if ($report!=null) {
                 continue;
             }
-            $report = Report::whereSlug($menu->href)->first();
+            $report = app(Report::class)->where('slug', $menu->href)->first();
         }
         if (!$report) {
             return redirect()->route('setup');
@@ -37,13 +36,12 @@ class ReportController extends Controller
 
     public function report($slug)
     {
-        $report = Report::whereSlug($slug)->first();
+        $report = app(Report::class)->where('slug', $slug)->first();
         if (!$report) {
             return 'Link broken';
         }
         $menus = [];
-        $this->expandMenu(Menu::whereNull('parent_id')->orderBy('sort_index')->get(), $menus);
-        $report->data = json_decode($report->data);
+        $this->expandMenu(app(Menu::class)->all()->where('parent_id', null)->sortBy('sort_index'), $menus);
         $renderer = new GridRenderer(new Datagrid());
         $gridTitle = '';
         $exportUrl = '';
@@ -51,7 +49,7 @@ class ReportController extends Controller
             'Grid only',
             'Grid with charts on the left',
             'Grid with charts on the right'
-        ]) && $report->data && $report->data->grid && $report->data->grid->id && $grid = Datagrid::find($report->data->grid->id)) {
+        ]) && $report->data && $report->data['grid'] && $report->data['grid']['id'] && $grid = app(Datagrid::class)->find($report->data['grid']['id'])) {
             $renderer = new GridRenderer($grid);
             $gridTitle = $grid->name;
         }
@@ -60,9 +58,8 @@ class ReportController extends Controller
 
     public function getHeaders($slug)
     {
-        $report = Report::whereSlug($slug)->firstOrFail();
-        $report->data = json_decode($report->data);
-        if ($report->data && $report->data->grid && $report->data->grid->id && $grid = Datagrid::find($report->data->grid->id)) {
+        $report = app(Report::class)->all()->where('slug', $slug)->first();
+        if ($report->data && $report->data['grid'] && $report->data['grid']['id'] && $grid = app(Datagrid::class)->find($report->data['grid']['id'])) {
             $renderer = new GridRenderer($grid);
             return $renderer->getHeaders();
         }
@@ -71,9 +68,8 @@ class ReportController extends Controller
 
     public function getBody($slug)
     {
-        $report = Report::whereSlug($slug)->firstOrFail();
-        $report->data = json_decode($report->data);
-        if ($report->data && $report->data->grid && $report->data->grid->id && $grid = Datagrid::find($report->data->grid->id)) {
+        $report = app(Report::class)->all()->where('slug', $slug)->first();
+        if ($report->data && $report->data['grid'] && $report->data['grid']['id'] && $grid = app(Datagrid::class)->find($report->data['grid']['id'])) {
             $renderer = new GridRenderer($grid);
             return $renderer->getBody();
         }
@@ -82,9 +78,8 @@ class ReportController extends Controller
 
     public function getFilters($slug)
     {
-        $report = Report::whereSlug($slug)->firstOrFail();
-        $report->data = json_decode($report->data);
-        if ($report->data && $report->data->grid && $report->data->grid->id && $grid = Datagrid::find($report->data->grid->id)) {
+        $report = app(Report::class)->all()->where('slug', $slug)->first();
+        if ($report->data && $report->data['grid'] && $report->data['grid']['id'] && $grid = app(Datagrid::class)->find($report->data['grid']['id'])) {
             $renderer = new GridRenderer($grid);
             return $renderer->getFilters();
         }
@@ -94,9 +89,9 @@ class ReportController extends Controller
     protected function expandMenu($menus = [], &$result)
     {
         foreach ($menus as $menu) {
-            $menuData = $menu->toArray();
+            $menuData = $menu;
             $nodes = [];
-            $this->expandMenu($menu->children, $nodes);
+            $this->expandMenu($menu->children(), $nodes);
             $menuData['nodes'] = $nodes;
             $result[] = $menuData;
         }
@@ -104,9 +99,8 @@ class ReportController extends Controller
 
     public function export($slug)
     {
-        $report = Report::whereSlug($slug)->firstOrFail();
-        $report->data = json_decode($report->data);
-        if ($report->data && $report->data->grid && $report->data->grid->id && $grid = Datagrid::find($report->data->grid->id)) {
+        $report = app(Report::class)->all()->where('slug', $slug)->first();
+        if ($report->data && $report->data['grid'] && $report->data['grid']['id'] && $grid = app(Datagrid::class)->find($report->data['grid']['id'])) {
             libxml_use_internal_errors(true);
             return Excel::download(new GridExport($grid), Str::slug($report->name) . '_' . date('YmdHis') . '.xlsx');
         }
@@ -115,11 +109,11 @@ class ReportController extends Controller
 
     public function preview($slug)
     {
-        $report = Report::whereSlug($slug)->firstOrFail();
-        $report->data = json_decode($report->data);
-        if ($report->data && $report->data->grid && $report->data->grid->id && $grid = Datagrid::find($report->data->grid->id)) {
+        $report = app(Report::class)->all()->where('slug', $slug)->first();
+        if ($report->data && $report->data['grid'] && $report->data['grid']['id'] && $grid = app(Datagrid::class)->find($report->data['grid']['id'])) {
             $renderer = new GridRenderer($grid);
             return view('exports.grid', [
+                'headers' => $renderer->getHeaders(),
                 'body' => $renderer->getBody(true)
             ]);
         }

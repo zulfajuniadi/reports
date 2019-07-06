@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "view_name": "customer_count_by_country",
+        "name": "Customer by Country",
+        "type": "Bar Chart",
+        "labels": "return [$row->Country];",
+        "datasets": "return $row->cnt;",
+        "query": "$query->orderBy('cnt', 'desc')->take(10);",
+        "updated_at": "2019-07-06 04:07:45",
+        "created_at": "2019-07-06 03:56:25",
+        "color_scheme": "brewer.RdYlGn11",
+        "label_pos": "right",
+        "bg_color": "#f9f9f9"
+    }
+]

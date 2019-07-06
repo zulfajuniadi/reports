@@ -1,0 +1,43 @@
+[
+    {
+        "id": 1,
+        "name": "Simple Grid",
+        "type": "Grid only",
+        "description": "Simple grid demo without any grouping",
+        "slug": "simple-grid",
+        "data": {
+            "rows": [],
+            "grid": {
+                "id": "1"
+            }
+        },
+        "updated_at": "2019-07-06 02:57:25",
+        "created_at": "2019-07-06 02:55:54"
+    },
+    {
+        "id": 2,
+        "name": "Dashboard",
+        "type": "Charts only",
+        "description": "Sample Dashboard",
+        "slug": "dashboard",
+        "data": {
+            "rows": [
+                {
+                    "height": 200,
+                    "cols": [
+                        {
+                            "type": "chart",
+                            "id": "1",
+                            "width": 3
+                        }
+                    ]
+                }
+            ],
+            "grid": {
+                "id": null
+            }
+        },
+        "updated_at": "2019-07-06 04:11:59",
+        "created_at": "2019-07-06 04:10:18"
+    }
+]

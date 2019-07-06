@@ -29,7 +29,7 @@ class GridRenderer
             'default_sort' => null,
             'default_sort_direction' => 'asc',
         ];
-        return view('grid.grid', $viewData);
+        return view('grid', $viewData);
     }
 
     public function getHeaders()
@@ -46,26 +46,26 @@ class GridRenderer
     {
         $filters = [];
         $plucks = [];
-        foreach ($this->grid->fields()->orderBy('sort_order')->get() as $field) {
-            if ($field->is_shown && $field->has_filter) {
+        foreach (collect($this->grid->fields)->sortBy('sort_order') as $field) {
+            if ($field['is_shown'] && $field['has_filter']) {
                 $values = [];
-                if (in_array($field->filter_type, ['Drop Down', 'Multiple Drop Down'])) {
-                    $plucks[] = $field->sys_name;
+                if (in_array($field['filter_type'], ['Drop Down', 'Multiple Drop Down'])) {
+                    $plucks[] = $field['sys_name'];
                 }
                 $filter = [
-                    'name' => $field->filter_name,
-                    'field' => $field->sys_name,
-                    'type' => $field->filter_type,
+                    'name' => $field['filter_name'],
+                    'field' => $field['sys_name'],
+                    'type' => $field['filter_type'],
                     'values' => $values,
-                    'is_default' => $field->has_default_filter == 1
+                    'is_default' => $field['has_default_filter'] == 1
                 ];
-                if ($field->has_default_filter) {
-                    $filter['value'] = $field->default_filter_value;
-                    if(strstr($field->default_filter_value, 'return ')) {
-                        $filter['value'] = eval($field->default_filter_value);
+                if ($field['has_default_filter']) {
+                    $filter['value'] = $field['default_filter_value'];
+                    if(strstr($field['default_filter_value'], 'return ')) {
+                        $filter['value'] = eval($field['default_filter_value']);
                     }
                 }
-                $filters[$field->sys_name] = $filter;
+                $filters[$field['sys_name']] = $filter;
             }
         }
         if (count($plucks) > 0) {

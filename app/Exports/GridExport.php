@@ -22,6 +22,7 @@ class GridExport implements FromView, ShouldAutoSize
     public function view(): View
     {
         return view('exports.grid', [
+            'headers' => $this->renderer->getHeaders(),
             'body' => $this->renderer->getBody(true)
         ]);
     }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6914debb9f21ebc346e80af71c47da71",
+    "content-hash": "8d3bca99315339f3bbe89d10b733594b",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -1598,6 +1598,64 @@
                 "php"
             ],
             "time": "2019-05-25T20:07:01+00:00"
+        },
+        {
+            "name": "okipa/laravel-model-json-storage",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Okipa/laravel-model-json-storage.git",
+                "reference": "23b6b1f879ce64ce3128cb5ff4d423b11b2ac724"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Okipa/laravel-model-json-storage/zipball/23b6b1f879ce64ce3128cb5ff4d423b11b2ac724",
+                "reference": "23b6b1f879ce64ce3128cb5ff4d423b11b2ac724",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "~5.0",
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^3.6"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Okipa\\LaravelModelJsonStorage\\ModelJsonStorageServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Okipa\\LaravelModelJsonStorage\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arthur LORENT",
+                    "email": "arthur.lorent@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Storing your models in a json file rather than in database (single or few lines recording) can be a good option. This package saves you to create a table for a ridiculous amount of lines, improves the data recovery performances, and allows you to store and access to your models from a json files as you would do it in database.",
+            "homepage": "https://github.com/Okipa/laravel-model-json-storage",
+            "keywords": [
+                "json",
+                "laravel",
+                "model",
+                "okipa",
+                "package",
+                "php",
+                "storage"
+            ],
+            "time": "2018-05-30T12:14:38+00:00"
         },
         {
             "name": "opis/closure",

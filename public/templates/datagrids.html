@@ -144,7 +144,7 @@
                 <div class="list-group list-group-flush">
                     <button class="text-left list-group-item list-group-flush"
                         ng-repeat="field in grid.fields | orderBy:sort_order" ng-click="$parent.$parent.field = field"
-                        ng-class="{active:field.id==$parent.$parent.field.id}">
+                        ng-class="{active:field.sys_name==$parent.$parent.field.sys_name}">
                         <div class="float-right">
                             <i ng-show="field.is_sortable=='1'" class="fa fa-sort-alpha-up"></i>
                             <i ng-show="field.has_filter=='1'" class="fa fa-filter"></i>
@@ -159,7 +159,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4" ng-if="field.id">
+        <div class="col-md-4" ng-if="field.sys_name">
             <div class="card">
                 <div class="card-header">
                     <div class="btn-group float-right">

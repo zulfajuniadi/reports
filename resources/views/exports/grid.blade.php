@@ -8,7 +8,26 @@
 </head>
 <body>
     <table>
-        {!! $body !!}
+        <thead>
+            <tr>
+                @foreach($headers as $header)
+                <th>{{$header['content']}}</th>
+                @endforeach
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($body as $row)
+                <tr>
+                @foreach($row['columns'] as $column)
+                @if(isset($column['align']) && $column['align'] == 'text-right')
+                    <td style="text-align:right">{{$column['content']}}</td>
+                @else
+                    <td>{{$column['content']}}</td>
+                @endif
+                @endforeach
+                </tr>
+            @endforeach
+        </tbody>
     </table>
 </body>
 </html>

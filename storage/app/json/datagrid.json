@@ -1,0 +1,181 @@
+[
+    {
+        "id": 1,
+        "view_name": "productdetails_v",
+        "name": "Product Details",
+        "fields": [
+            {
+                "sys_name": "Id",
+                "sort_order": 0,
+                "name": "Id",
+                "filter_name": "Id",
+                "is_shown": "0",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "number"
+            },
+            {
+                "sys_name": "ProductName",
+                "sort_order": 1,
+                "name": "Productname",
+                "filter_name": "Productname",
+                "is_shown": "1",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "string"
+            },
+            {
+                "sys_name": "SupplierId",
+                "sort_order": 2,
+                "name": "Supplierid",
+                "filter_name": "Supplierid",
+                "is_shown": "0",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "number"
+            },
+            {
+                "sys_name": "CategoryId",
+                "sort_order": 3,
+                "name": "Categoryid",
+                "filter_name": "Categoryid",
+                "is_shown": "0",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "number"
+            },
+            {
+                "sys_name": "QuantityPerUnit",
+                "sort_order": 4,
+                "name": "Quantityperunit",
+                "filter_name": "Quantityperunit",
+                "is_shown": "1",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "string"
+            },
+            {
+                "sys_name": "UnitPrice",
+                "sort_order": 5,
+                "name": "Unitprice",
+                "filter_name": "Unitprice",
+                "is_shown": "1",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "number"
+            },
+            {
+                "sys_name": "UnitsInStock",
+                "sort_order": 6,
+                "name": "Unitsinstock",
+                "filter_name": "Unitsinstock",
+                "is_shown": "1",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "number"
+            },
+            {
+                "sys_name": "UnitsOnOrder",
+                "sort_order": 7,
+                "name": "Unitsonorder",
+                "filter_name": "Unitsonorder",
+                "is_shown": "1",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "number"
+            },
+            {
+                "sys_name": "ReorderLevel",
+                "sort_order": 8,
+                "name": "Reorderlevel",
+                "filter_name": "Reorderlevel",
+                "is_shown": "1",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "number"
+            },
+            {
+                "sys_name": "Discontinued",
+                "sort_order": 9,
+                "name": "Discontinued",
+                "filter_name": "Discontinued",
+                "is_shown": "1",
+                "is_sortable": "1",
+                "has_filter": "1",
+                "has_default_filter": "1",
+                "filter_type": "Drop Down",
+                "data_type": "number",
+                "default_filter_value": "0"
+            },
+            {
+                "sys_name": "CategoryName",
+                "sort_order": 10,
+                "name": "Categoryname",
+                "filter_name": "Categoryname",
+                "is_shown": "1",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "string"
+            },
+            {
+                "sys_name": "CategoryDescription",
+                "sort_order": 11,
+                "name": "Categorydescription",
+                "filter_name": "Categorydescription",
+                "is_shown": "1",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "string"
+            },
+            {
+                "sys_name": "SupplierName",
+                "sort_order": 12,
+                "name": "Suppliername",
+                "filter_name": "Suppliername",
+                "is_shown": "1",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "string"
+            },
+            {
+                "sys_name": "SupplierRegion",
+                "sort_order": 13,
+                "name": "Supplierregion",
+                "filter_name": "Supplierregion",
+                "is_shown": "1",
+                "is_sortable": "1",
+                "has_filter": "0",
+                "has_default_filter": "0",
+                "filter_type": "Search",
+                "data_type": "string"
+            }
+        ],
+        "is_enabled": "1",
+        "updated_at": "2019-07-07 00:08:40",
+        "created_at": "2019-07-07 00:05:08"
+    }
+]

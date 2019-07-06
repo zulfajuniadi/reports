@@ -45,7 +45,7 @@ angular.module('Report', [])
         $scope.status = 'Loading...';
         $scope.editingFilter = {};
         $scope.editingFilterSource = {};
-        $scope.tbody = '';
+        $scope.datas = [];
         $scope.headers = [];
         $scope.currentSort = null;
         $scope.currentSortDir = 'asc';
@@ -298,10 +298,8 @@ angular.module('Report', [])
         $scope.refreshTable = function refreshTable () {
             $('.loading-blocker').show();
             $http.get(window.location.origin + window.location.pathname + '/body' + window.location.search).then(function(response){
-                    var html = $interpolate(response.data)($scope);
-                    $scope.tbody = $sce.trustAsHtml(html);
+                    $scope.data = response.data;
                     $('.loading-blocker').hide();
-                    $scope.$applyAsync();
             },function(){
                 $('.loading-blocker').hide();
             })

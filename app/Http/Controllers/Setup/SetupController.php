@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 use App\Models\Menu;
 use App\Models\Datagrid;
 use Doctrine\DBAL\Driver\IBMDB2\DB2Driver;
-use App\Models\Field;
 use App\Models\Chart;
 use App\Models\Report;
 
@@ -25,7 +24,8 @@ class SetupController extends Controller
     public function menus()
     {
         $menu = [];
-        $this->expandMenu(Menu::whereNull('parent_id')->orderBy('sort_index')->get(), $menu);
+        $models = app(Menu::class)->all()->sortBy('sort_index');
+        $this->expandMenu($models, $menu);
         return $menu;
     }
 
@@ -33,9 +33,11 @@ class SetupController extends Controller
     {
         $menu = [];
         $this->flattenMenu($request->get('menus'), $menu);
-        Menu::whereNotNull('id')->delete();
+        app(Menu::class)->all()->each(function ($model) {
+            $model->delete();
+        });
         foreach ($menu as $row) {
-            Menu::create($row);
+            app(Menu::class)->create($row);
         }
     }
 
@@ -43,39 +45,34 @@ class SetupController extends Controller
 
     public function dataGrids()
     {
-        return Datagrid::orderBy('name')->get();
+        return app(Datagrid::class)->orderBy('name')->get();
     }
 
     public function createDataGrid(Request $request)
     {
         $data = $request->except('_token');
-        return Datagrid::create($data);
+        $data['fields'] = [];
+        $data['is_enabled'] = '1';
+        return app(Datagrid::class)->create($data);
     }
 
     public function showDataGrid($id)
     {
-        $grid =  Datagrid::find($id);
-        $grid->fields = $grid->fields()->orderBy('sort_order')->get();
+        $grid = app(Datagrid::class)->findOrFail($id);
         return $grid;
     }
 
     public function updateDataGrid(Request $request, $id)
     {
-        $data = $request->except('id', '_token', 'created_at', 'updated_at', 'fields');
-        $grid = Datagrid::findOrFail($id);
+        $data = $request->except('id', '_token', 'created_at', 'updated_at');
+        $grid = app(Datagrid::class)->findOrFail($id);
         $grid->update($data);
-        $fields = $request->get('fields');
-        if ($fields) {
-            foreach ($fields as $field) {
-                Field::findOrFail($field['id'])->update($field);
-            }
-        }
         return $grid;
     }
 
     public function deleteDataGrid($id)
     {
-        $grid = Datagrid::findOrFail($id);
+        $grid = app(Datagrid::class)->findOrFail($id);
         $grid->delete();
     }
 
@@ -90,34 +87,31 @@ class SetupController extends Controller
 
     public function refreshFields($id)
     {
-        $grid = Datagrid::findOrFail($id);
+        $grid = app(Datagrid::class)->findOrFail($id);
+        $fields = [];
+        foreach ($grid->fields as $field) {
+            $fields[$field['sys_name']] = $field;
+        }
         set_time_limit(600);
         $row = DB::connection(config('database.report_db'))->table($grid->view_name)->take(1)->get();
         if ($row->count() > 0) {
             $vars = get_object_vars($row[0]);
-            $found = [];
             foreach (array_keys($vars) as $index => $name) {
-                $found[] = $name;
-                $existing = $grid->fields()->whereSysName($name)->first();
-                $data = [];
-                if ($existing) {
-                    $data = $existing->toArray();
-                }
-                $grid->fields()->updateOrCreate([
+                $fields[$name] = [
                     'sys_name' => $name,
-                    'datagrid_id' => $grid->id
-                ], [
-                    'sort_order' => isset($data['sort_order']) ? $data['sort_order'] : $index,
-                    'name' => isset($data['name']) ? $data['name'] : Str::title(str_replace('_', ' ', $name)),
-                    'filter_name' => isset($data['filter_name']) ? $data['filter_name'] : Str::title(str_replace('_', ' ', $name)),
-                    'is_shown' =>  isset($data['is_shown']) ? $data['is_shown'] : true,
-                    'has_filter' =>  isset($data['has_filter']) ? $data['has_filter'] : false,
-                    'filter_type' => isset($data['filter_type']) ? $data['filter_type'] : 'Search',
-                    'data_type' => isset($data['data_type']) ? $data['data_type'] : guessDataType($vars[$name]),
-                ]);
+                    'sort_order' => isset($fields[$name]['sort_order']) ? $fields[$name]['sort_order'] : $index,
+                    'name' => isset($fields[$name]['name']) ? $fields[$name]['name'] : Str::title(str_replace('_', ' ', $name)),
+                    'filter_name' => isset($fields[$name]['filter_name']) ? $fields[$name]['filter_name'] : Str::title(str_replace('_', ' ', $name)),
+                    'is_shown' =>  isset($fields[$name]['is_shown']) ? $fields[$name]['is_shown'] : '1',
+                    'is_sortable' =>  isset($fields[$name]['is_sortable']) ? $fields[$name]['is_sortable'] : '1',
+                    'has_filter' =>  isset($fields[$name]['has_filter']) ? $fields[$name]['has_filter'] : '0',
+                    'has_default_filter' =>  isset($fields[$name]['has_default_filter']) ? $fields[$name]['has_default_filter'] : '0',
+                    'filter_type' => isset($fields[$name]['filter_type']) ? $fields[$name]['filter_type'] : 'Search',
+                    'data_type' => isset($fields[$name]['data_type']) ? $fields[$name]['data_type'] : guessDataType($vars[$name]),
+                ];
             }
-            $grid->fields()->whereNotIn('sys_name', $found)->delete();
-            $grid->fields = $grid->fields()->orderBy('is_shown', 'desc')->orderBy('sort_order')->get();
+            $grid->fields = array_values($fields);
+            $grid->save();
             return $grid;
         } else {
             return [];
@@ -128,13 +122,12 @@ class SetupController extends Controller
 
     public function charts()
     {
-        return Chart::orderBy('name')->get();
+        return app(Chart::class)->orderBy('name')->get();
     }
     
     public function showCharts($id)
     {
-        $chart = Chart::findOrFail($id);
-        return $chart;
+        return app(Chart::class)->findOrFail($id);
     }
     
     public function createCharts(Request $request)
@@ -144,12 +137,14 @@ class SetupController extends Controller
         $data['labels'] = '// return $row->label;';
         $data['datasets'] = '// return $row->count;';
         $data['query'] = "\$query->where('year', date('Y'))->where('month', date('m'));\n";
-        return Chart::create($data);
+        $data['bg_color'] = '#f9f9f9';
+        $data['color_scheme'] = 'brewer.RdYlGn11';
+        return app(Chart::class)->create($data);
     }
     
     public function updateCharts(Request $request, $id)
     {
-        $chart = Chart::findOrFail($id);
+        $chart = app(Chart::class)->findOrFail($id);
         $data = $request->except('_token');
         $chart->update($data);
         return $chart;
@@ -157,13 +152,13 @@ class SetupController extends Controller
     
     public function deleteCharts($id)
     {
-        $chart = Chart::findOrFail($id);
+        $chart = app(Chart::class)->findOrFail($id);
         $chart->delete();
     }
 
     public function getChartData($id)
     {
-        $chart = Chart::findOrFail($id);
+        $chart = app(Chart::class)->findOrFail($id);
         $query = DB::connection(config('database.report_db'))->table($chart->view_name);
         if ($chart->query) {
             eval($chart->query) . ';';
@@ -183,53 +178,51 @@ class SetupController extends Controller
 
     public function reports()
     {
-        return Report::orderBy('name')->get();
+        return app(Report::class)->orderBy('name')->get();
     }
 
     public function createReport(Request $request)
     {
         $suffix = '';
         
-        if ($existingCount = Report::whereName($request->get('name'))->count()) {
+        if ($existingCount = app(Report::class)->where('name', $request->get('name'))->count()) {
             $suffix = '-' . $existingCount;
         }
 
-        return Report::create([
+        return app(Report::class)->create([
             'name' => $request->get('name'),
             'type' => $request->get('type'),
             'description' => $request->get('description'),
             'slug' => Str::slug($request->get('name')) . $suffix,
-            'data' => '{"rows":[],"grid":{"id":null}}'
+            'data' => ['rows' => [], 'grid' => ['id' => null]]
         ]);
     }
 
     public function report($id)
     {
-        $report = Report::findOrFail($id);
-        $report->data = json_decode($report->data);
+        $report = app(Report::class)->findOrFail($id);
         return $report;
     }
 
     public function updateReport(Request $request, $id)
     {
-        $report = Report::findOrFail($id);
+        $report = app(Report::class)->findOrFail($id);
         $data = $request->except('slug', 'created_at', 'updated_at', 'token');
         if ($report->name != $data['name']) {
             $suffix = '';
             
-            if ($existingCount = Report::whereName($request->get('name'))->count()) {
+            if ($existingCount = app(Report::class)->whereName($request->get('name'))->count()) {
                 $suffix = '-' . $existingCount;
             }
             $data['slug'] = Str::slug($request->get('name')) . $suffix;
         }
-        $data['data'] = json_encode($data['data']);
         $report->update($data);
         return $report;
     }
 
     public function deleteReport($id)
     {
-        Report::findOrFail($id)->delete();
+        app(Report::class)->findOrFail($id)->delete();
     }
 
     // utilities functions
@@ -237,9 +230,9 @@ class SetupController extends Controller
     protected function expandMenu($menus = [], &$result)
     {
         foreach ($menus as $menu) {
-            $menuData = $menu->toArray();
+            $menuData = $menu;
             $nodes = [];
-            $this->expandMenu($menu->children, $nodes);
+            $this->expandMenu($menu->children(), $nodes);
             $menuData['nodes'] = $nodes;
             $result[] = $menuData;
         }

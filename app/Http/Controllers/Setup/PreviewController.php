@@ -15,7 +15,7 @@ class PreviewController extends Controller
 
     public function __construct()
     {
-        $this->grid = Datagrid::findOrFail(request()->segment(4));
+        $this->grid = app(Datagrid::class)->findOrFail(intval(request()->segment(4)));
         $this->renderer = new GridRenderer($this->grid);
     }
 
