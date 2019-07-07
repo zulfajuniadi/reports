@@ -19,7 +19,7 @@
             @foreach ($body as $row)
                 <tr>
                 @foreach($row['columns'] as $column)
-                @if(isset($column['align']) && $column['align'] == 'text-right')
+                @if(isset($column['class']) && $column['class'] == 'text-right')
                     <td style="text-align:right">{{$column['content']}}</td>
                 @else
                     <td>{{$column['content']}}</td>

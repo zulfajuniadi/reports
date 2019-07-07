@@ -24,7 +24,7 @@ class SetupController extends Controller
     public function menus()
     {
         $menu = [];
-        $models = app(Menu::class)->all()->sortBy('sort_index');
+        $models = app(Menu::class)->all()->where('parent_id', null)->sortBy('sort_index');
         $this->expandMenu($models, $menu);
         return $menu;
     }

@@ -13,8 +13,6 @@ class Menu extends Model
 
     public function children()
     {
-        return app(static::class)->where('parent_id', $this->id)->get()->map(function($data){
-            return new static($data);
-        });
+        return app(static::class)->all()->where('parent_id', $this->id);
     }
 }

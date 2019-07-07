@@ -152,7 +152,7 @@ class Table
             ];
             foreach ($row as $column) {
                 if (is_numeric($column)) {
-                    $newRow['columns'][] = ['align' => 'text-right', 'content' => $column];
+                    $newRow['columns'][] = ['class' => 'text-right', 'content' => $column];
                 } else {
                     $newRow['columns'][] = ['content' => $column];
                 }
