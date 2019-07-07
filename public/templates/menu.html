@@ -14,11 +14,11 @@
         <div ng-if="node.is_enabled=='1'">
             {{node.title}}
         </div>
-        <span class="text-muted">{{node.type}}: {{node.href||'-'}}</span>
+        <span ng-if="node.type=='none'" class="text-muted">{{node.type}}</span>
+        <span ng-if="node.type!='none'" class="text-muted">{{node.type}}: {{node.href||'-'}}</span>
     </div>
     <ol ui-tree-nodes="" ng-model="node.nodes">
-      <li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
-      </li>
+      <li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
     </ol>
   </script>
 

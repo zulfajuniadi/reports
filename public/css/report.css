@@ -270,3 +270,10 @@ h3 small {
     top: -3px;
     z-index: 1;
 }
+
+
+.angular-ui-tree-dropzone, .angular-ui-tree-empty {
+    background-image: none;
+    background-color: transparent;
+    border: 0px solid;
+}

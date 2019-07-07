@@ -508,6 +508,7 @@ angular.module('setup', ['ui.router', 'ui.tree', 'Report'])
                 title: 'New Menu',
                 type: 'link',
                 href: '#',
+                is_enabled: '1',
                 nodes: []
             };
             if (!parent) {
