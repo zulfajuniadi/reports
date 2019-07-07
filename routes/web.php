@@ -21,9 +21,7 @@ Route::get('/reports/{slug}/preview', 'ReportController@preview');
 
 Route::get('/api/data/chart/{id}', 'Setup\\SetupController@showCharts');
 Route::get('/api/data/chart/{id}/data', 'Setup\\SetupController@getChartData');
-// Route::get('/api/data/grid/{id}', 'Setup\\SetupController@showDataGrid');
-// Route::get('/api/data/grid/{id}/body', 'Setup\\PreviewController@getBody');
-// Route::get('/api/data/grid/{id}/filters', 'Setup\\PreviewController@getFilters');
+Route::get('/api/data/grid/{id}', 'Setup\\SetupController@showDataGrid');
 
 Route::group(['namespace' => 'Setup', 'prefix' => 'setup'], function () {
     Route::get('', 'SetupController@index')->name('setup');

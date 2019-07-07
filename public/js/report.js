@@ -25,6 +25,8 @@ angular.module('Report', [])
                 $gridData = {};
                 $http.get(_dataPath + '/grid/' + $scope.grid.id).then(function (response) {
                     $scope.gridData = response.data;
+                }, function(){
+                    return;
                 });
             }
         }, true);
@@ -93,9 +95,9 @@ angular.module('Report', [])
                 var parts = str.split('=');
                 if (parts.length == 2) {
                     var key = decodeURIComponent(parts[0]);
-                    if (parts[0] == 'sort_by_column') {
+                    if (parts[0] == 'sort_by_columns') {
                         $scope.currentSort = parts[1];
-                    } else if (parts[0] == 'sort_by_direction') {
+                    } else if (parts[0] == 'sort_by_directions') {
                         $scope.currentSortDir = parts[1];
                     } else if (key.indexOf('[]') > -1) {
                         key = key.substr(0, key.length - 2);
@@ -177,7 +179,7 @@ angular.module('Report', [])
             if ($scope.currentSort) {
                 var foundIndex = -1;
                 qs.forEach(function (params, index) {
-                    if (params.indexOf('sort_by_column') > -1) {
+                    if (params.indexOf('sort_by_columns') > -1) {
                         foundIndex = index;
                     }
                 });
@@ -186,19 +188,19 @@ angular.module('Report', [])
                 }
                 foundIndex = -1;
                 qs.forEach(function (params, index) {
-                    if (params.indexOf('sort_by_direction') > -1) {
+                    if (params.indexOf('sort_by_directions') > -1) {
                         foundIndex = index;
                     }
                 });
                 if (foundIndex > -1) {
                     qs.splice(foundIndex, 1);
                 }
-                qs.push('sort_by_column=' + $scope.currentSort);
-                qs.push('sort_by_direction=' + $scope.currentSortDir);
+                qs.push('sort_by_columns=' + $scope.currentSort);
+                qs.push('sort_by_directions=' + $scope.currentSortDir);
             } else {
                 var foundIndex = -1;
                 qs.forEach(function (params, index) {
-                    if (params.indexOf('sort_by_column') > -1) {
+                    if (params.indexOf('sort_by_columns') > -1) {
                         foundIndex = index;
                     }
                 });
@@ -207,7 +209,7 @@ angular.module('Report', [])
                 }
                 foundIndex = -1;
                 qs.forEach(function (params, index) {
-                    if (params.indexOf('sort_by_direction') > -1) {
+                    if (params.indexOf('sort_by_directions') > -1) {
                         foundIndex = index;
                     }
                 });

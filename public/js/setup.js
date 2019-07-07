@@ -62,6 +62,8 @@ angular.module('setup', ['ui.router', 'ui.tree', 'Report'])
                     return $http.get(_basePath + '/reports/' + $stateParams.report_id)
                         .then(function (response) {
                             return response.data;
+                        }, function(){
+                            return null;
                         });
                 }
                 return $q.resolve({});

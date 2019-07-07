@@ -269,6 +269,14 @@
                         <p class="mt-1 ml-2"><i>Table "{{gridData.name}}" will be rendered here</i></p>
                     </div>
                 </div>
+                <div ng-if="!gridData.id" class="row">
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Choose Grid:</h4>
+                        <select ng-model="$parent.$parent.$parent.report.data.grid.id" class="form-control">
+                            <option value="{{grid.id}}" ng-repeat="grid in dataGrids">{{grid.name}}</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

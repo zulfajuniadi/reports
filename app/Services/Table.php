@@ -108,8 +108,8 @@ class Table
             }
         }
 
-        if ($sortBy = request()->get('sort_by_column')) {
-            $rawQuery->orderBy($sortBy, request()->get('sort_by_direction', 'asc'));
+        if ($sortBy = request()->get('sort_by_columns')) {
+            $rawQuery->orderBy($sortBy, request()->get('sort_by_directions', 'asc'));
         } elseif (!$this->grid->is_summary) {
             if ($this->grid->sort_field_id) {
                 $rawQuery->orderBy(Field::findOrFail($this->grid->sort_field_id)->sys_name, $this->grid->sort_direction);
